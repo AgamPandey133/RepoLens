@@ -76,10 +76,10 @@ const SignUpPage = () => {
       {/* Branding */}
       <div className="z-10 mb-8 select-none">
         <span className="text-5xl font-extrabold tracking-tighter text-foreground drop-shadow-lg">
-          ask
+          Repo
         </span>
         <span className="text-5xl font-extrabold tracking-tighter text-primary drop-shadow-lg">
-          Git
+          Lens
         </span>
       </div>
 

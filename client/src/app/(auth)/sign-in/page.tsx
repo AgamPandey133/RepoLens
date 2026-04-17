@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { Button } from "@/components/ui/button"
 import { useSignIn } from "@/hooks/use-signin"
@@ -39,10 +39,10 @@ const SignInPage = () => {
       {/* --- RepoLens Branding --- */}
       <div className="z-10 mb-8 select-none">
         <span className="text-5xl font-extrabold tracking-tighter text-foreground drop-shadow-lg">
-          ask
+          Repo
         </span>
         <span className="text-5xl font-extrabold tracking-tighter text-primary drop-shadow-lg">
-          Git
+          Lens
         </span>
       </div>
       {/* ----------------------- */}
