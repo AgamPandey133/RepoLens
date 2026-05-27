@@ -1,71 +1,76 @@
-﻿# 🧑‍💻 RepoLens – AI-Powered Developer Collaboration Platform
+# 🧑‍💻 RepoLens – AI-Powered Developer Collaboration Platform
 
-**RepoLens** is a powerful AI-driven platform designed to simplify developer collaboration.  
-It integrates cutting-edge tools for documentation, code understanding, meeting intelligence, and teamwork—making software development more **efficient, transparent, and collaborative**.  
+**RepoLens** is an advanced AI-driven platform designed to simplify developer collaboration. It integrates cutting-edge tools for codebase understanding, agentic PR reviews, meeting intelligence, and robust AI observability. 
+
+Built not just as a wrapper, but as a full-fledged AI Engineering project featuring **Hybrid RAG**, **Agentic Workflows**, and **LLM Observability**.
 
 ---
-## Images
-![Dashboard](/public/Screenshot%202025-10-04%20230526.png)
-![QuestionPage](/public/Screenshot%202025-10-04%20230545.png)
-![AskQuestion](/public/Screenshot%202025-10-04%20230607.png)
-![meetingPage](/public/Screenshot%202025-10-04%20230617.png)
-![meetingSummaries](/public/Screenshot%202025-10-04%20230629.png)
-![projectStructure](/public/Screenshot%202025-10-04%20231234.png)
 
+## 🚀 AI Engineering Highlights
 
-## 🚀 Features
+This project demonstrates advanced AI engineering patterns beyond basic LLM API calls:
 
-### 📄 Automatic Code Documentation
-- **RepoLens** automatically generates detailed and structured documentation from your codebase.  
-- Helps both newcomers and experienced developers quickly understand project structure, logic, and purpose.  
+### 🧠 3-Stage Hybrid RAG Engine
+- **Vector Search:** Dense retrieval using `pgvector` for semantic codebase search.
+- **BM25 Keyword Re-ranking:** TF-IDF based term frequency scoring (built natively in TypeScript) to boost exact-match variable/file names.
+- **LLM Cross-Encoder Re-ranking:** Uses Gemini-2.0-Flash to score and re-rank the top candidates based on contextual relevance to the query.
 
-### 🔍 Codebase Search
-- **Context-aware search** across the entire codebase.  
-- Instantly find functions, classes, and components without manually digging through files.  
+### 🤖 Agentic PR Reviews (Plan → Retrieve → Review → Reflect)
+A multi-step autonomous agent that reviews Pull Requests:
+1. **Plan:** Parses the PR diff via GitHub API to determine scope.
+2. **Retrieve:** Runs the Hybrid RAG engine per changed file to fetch related context.
+3. **Review:** Generates a structured JSON review (bugs, improvements, security).
+4. **Reflect:** Self-corrects by verifying each comment against the retrieved context to eliminate hallucinations.
+
+### 📊 AI Observability & Evaluation
+- **RAGAS-style Faithfulness Scoring:** Every Q&A answer is automatically evaluated (0-100) to measure how grounded it is in the retrieved codebase context.
+- **Latency & Cost Tracking:** Every LLM call is logged with prompt/completion token usage and latency metrics.
+- **Analytics Dashboard:** A dedicated dashboard visualizing RAG quality trends, API call volume, and feature-level token costs using Recharts.
+
+---
+
+## 📸 Platform Features
+
+### 📄 Intelligent Codebase Q&A
+Ask natural language questions about your codebase. See the exact files referenced and a real-time **Faithfulness Confidence Score** for the answer.
+
+### 🔍 Automated Code Documentation & Search
+Automatically generates embeddings and summaries for every file in your repository, allowing lightning-fast contextual search.
+
+### 🎙️ Meeting Transcription & Intelligence
+Powered by **AssemblyAI**, RepoLens transcribes team meetings, extracts key topics, and allows contextual chat against past discussions.
 
 ### 📝 Commit Message Summaries
-- AI-powered commit summarization keeps you up to date with repository changes.  
-- Saves time in understanding commit history.  
-
-### 🎙️ Meeting Transcription
-- Powered by **AssemblyAI**, **RepoLens** transcribes team meetings.  
-- Extracts **key topics** and provides accurate summaries for future reference.  
-
-### ⚡ Real-Time Contextual Meeting Search
-- Ask contextual questions about **past meetings** and get real-time answers.  
-- Never lose track of discussions or action items.  
-
-### 🤝 Collaborative Platform
-- Centralized place for dev teams to:
-  - Access **documentation**  
-  - Review **commit & meeting summaries**  
-  - Perform **intelligent codebase searches**  
-  - Collaborate seamlessly with AI support  
+AI-powered commit summarization keeps you up to date with repository changes instantly.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- 🌐 **[Next.js 15](https://nextjs.org/)** with the modern **App Router**  
-- 🎨 **[Shadcn](https://ui.shadcn.com/)** + **[Tailwind CSS](https://tailwindcss.com/)** for beautiful, consistent UI  
-- 🧠 **[Google Gemini AI API](https://ai.google.dev/)** for advanced language model features  
-- 🗃️ **ORMs** for efficient and type-safe database interaction  
-- 🔗 **LangChain** for orchestration of AI workflows and context-aware retrieval  
-- 🎙️ **[AssemblyAI](https://www.assemblyai.com/)** for meeting transcription & audio summarization  
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **UI:** [Shadcn UI](https://ui.shadcn.com/) + Tailwind CSS + Recharts
+- **Database:** PostgreSQL + [Prisma ORM](https://www.prisma.io/)
+- **Vector Store:** Supabase with `pgvector`
+- **AI Models:** Google Gemini 2.0 Flash (`@google/generative-ai`)
+- **Audio Intelligence:** [AssemblyAI](https://www.assemblyai.com/)
+- **LLM Orchestration:** Custom Agentic TS pipelines + AI SDK
 
 ---
 
-## 📂 Project Structure
+## 📂 Architecture
 
-```
-RepoLens/
-│── app/               # Next.js App Router
-│── components/        # Reusable UI components (Shadcn, Tailwind)
-│── lib/               # AI & utility functions (Gemini, LangChain, AssemblyAI)
-│── pages/             # Route handling
-│── public/            # Static assets
-│── styles/            # Tailwind global styles
-│── package.json       # Dependencies & scripts
+```mermaid
+graph TD
+    A[User Query] --> B(Vector Search: pgvector)
+    B --> C(BM25 Keyword Scoring)
+    C --> D(LLM Re-ranking: Gemini)
+    D --> E[Final Top Context]
+    E --> F(LLM Answer Generation)
+    F --> G(Faithfulness Evaluator)
+    G --> H[Final Output + Confidence Score]
+    
+    style A fill:#4f46e5,stroke:#fff,color:#fff
+    style H fill:#10b981,stroke:#fff,color:#fff
 ```
 
 ---
@@ -75,8 +80,7 @@ RepoLens/
 1. **Clone the repository**
    ```bash
    git clone https://github.com/your-username/RepoLens.git
-   cd RepoLens
-   cd client
+   cd RepoLens/client
    ```
 
 2. **Install dependencies**
@@ -85,61 +89,33 @@ RepoLens/
    ```
 
 3. **Set environment variables**  
-   Create a `.env.local` file and add:
+   Create a `.env` file and add:
    ```bash
-    DATABASE_URL = 
-    NODE_ENV = 
-    URL = 
-    GITHUB_TOKEN = 
-    GEMINI_API_KEY = 
-    ASSEMBLY_API_KEY = 
-
-    NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY= 
-
-    NEXT_PUBLIC_SUPABASE_URL=
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=
+   DATABASE_URL="postgresql://postgres:password@host:5432/postgres"
+   DIRECT_URL="postgresql://postgres:password@host:5432/postgres"
+   GITHUB_ACCESS_TOKEN="your_github_token"
+   GEMINI_API_KEY="your_gemini_key"
+   ASSEMBLY_API_KEY="your_assemblyai_key"
+   NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
    ```
 
-4. **Run the development server**
+4. **Run Database Migrations**
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. **Run the development server**
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser 🚀  
-
----
-
-## 📌 Roadmap
-
-- [ ] GitHub & GitLab integration for automatic commit tracking  
-- [ ] AI-powered PR reviews  
-- [ ] Slack/Discord bot integration for instant meeting summaries  
-- [ ] Multi-language support for global dev teams  
+6. Open [http://localhost:3000](http://localhost:3000) 🚀  
 
 ---
 
 ## 🤝 Contributing
-
-Contributions are welcome!  
-Please fork this repository and submit a pull request for review.  
-
----
+Contributions are welcome! Please fork this repository and submit a pull request.
 
 ## 📜 License
-
-This project is licensed under the **MIT License** – feel free to use and adapt it for your own projects.  
-
----
-
-## 🌟 Acknowledgements
-
-- [Next.js](https://nextjs.org/)  
-- [Shadcn](https://ui.shadcn.com/)  
-- [Tailwind CSS](https://tailwindcss.com/)  
-- [Google Gemini AI](https://ai.google.dev/)  
-- [LangChain](https://www.langchain.com/)  
-- [AssemblyAI](https://www.assemblyai.com/)  
-
----
-
-🚀 **RepoLens – Making Developer Collaboration Smarter with AI**  
+Licensed under the **MIT License**.

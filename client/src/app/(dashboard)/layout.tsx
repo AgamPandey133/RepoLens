@@ -9,7 +9,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { user, isLoading } = useAuth();
     const { projects, setProjectId, isLoading: isProjectLoader } = useProject();
 
-    if (isLoading || isProjectLoader || !user) {
+    if (isLoading || isProjectLoader) {
+        return <Spinner/>
+    }
+
+    if (!user) {
+        // If we reach here, it means the token cookie is present but invalid/expired.
+        // Client-side redirect to sign-in.
+        if (typeof window !== 'undefined') {
+            window.location.href = '/sign-in';
+        }
         return <Spinner/>
     }
     

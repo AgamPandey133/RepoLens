@@ -4,6 +4,7 @@ import CommitLog from '@/components/dashboard/CommitLog';
 import DeleteButton from '@/components/dashboard/DeleteButton';
 import InviteButton from '@/components/dashboard/InviteMeeting';
 import MeetingCard from '@/components/dashboard/MeetingCard';
+import PRReviewCard from '@/components/dashboard/PRReviewCard';
 import TeamMembers from '@/components/dashboard/TeamMember';
 import { Spinner } from '@/components/Spinner';
 import { useAuth } from '@/hooks/use-auth';
@@ -63,6 +64,10 @@ const Page = () => {
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-5'>
                     <AskQuestionCard  />
                     <MeetingCard />
+                </div>
+                
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-5 mt-4'>
+                    <PRReviewCard />
                 </div>
             </div>
 

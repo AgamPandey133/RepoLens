@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,7 +17,9 @@ import {
     FolderKanban,
     PanelLeftClose,
     PanelRightClose,
-    PlusCircle
+    PlusCircle,
+    BarChart2,
+    GitPullRequest
 } from "lucide-react";
 
 // Helper for cleaner class names
@@ -28,7 +30,8 @@ import { Project } from "@prisma/client";
 const mainNavLinks = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/qa", label: "Q&A", icon: MessageCircle },
-    { href: "/meetings", label: "Meetings", icon: Users }, // Using a more appropriate icon
+    { href: "/meetings", label: "Meetings", icon: Users },
+    { href: "/analytics", label: "AI Analytics", icon: BarChart2 },
 ];
 
 export const SidebarComp = ({projects,setProjectId,isLoading}) => {

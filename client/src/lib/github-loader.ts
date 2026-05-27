@@ -30,19 +30,31 @@ export const loadGithubRepo = async (repoUrl: string, githubToken?: string) => {
  */
 export const generateEmbeddings = async (docs: Document[]) => {
     console.log("generating embeddings-------------------");
-    return Promise.all(
-        docs.map(async (doc) => {
+    const results = [];
+    
+    // Process sequentially or in small batches to avoid Gemini API rate limits
+    for (let i = 0; i < docs.length; i++) {
+        const doc = docs[i];
+        try {
             const summary = await summariseCode(doc);
             const embedding = await generateEmbedding(summary);
 
-            return {
+            results.push({
                 summary,
                 embedding,
                 sourceCode: JSON.parse(JSON.stringify(doc.pageContent)),
                 fileName: doc.metadata.source,
-            };
-        })
-    );
+            });
+        } catch (error) {
+            console.error(`Failed to process document ${doc.metadata.source}:`, error);
+            // Skip this document if embedding fails (e.g., due to rate limits)
+        }
+        
+        // Add a tiny delay to help with rate limits
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    return results;
 };
 
 /**
