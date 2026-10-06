@@ -37,8 +37,8 @@ Ask natural language questions about your codebase. See the exact files referenc
 ### 🔍 Automated Code Documentation & Search
 Automatically generates embeddings and summaries for every file in your repository, allowing lightning-fast contextual search.
 
-### 🎙️ Meeting Transcription & Intelligence
-Powered by **AssemblyAI**, RepoLens transcribes team meetings, extracts key topics, and allows contextual chat against past discussions.
+### 🎙️ Autonomous Meeting Bot & Intelligence
+Powered by **Recall.ai** and **AssemblyAI**, RepoLens can automatically join your team meetings (Google Meet, Zoom), record them, and perform **Speaker Diarization**. Gemini 2.0 then analyzes the transcript to extract key topics, who raised which issues, and proposed solutions.
 
 ### 📝 Commit Message Summaries
 AI-powered commit summarization keeps you up to date with repository changes instantly.
@@ -96,6 +96,7 @@ graph TD
    GITHUB_ACCESS_TOKEN="your_github_token"
    GEMINI_API_KEY="your_gemini_key"
    ASSEMBLY_API_KEY="your_assemblyai_key"
+   RECALL_API_KEY="your_recall_key"
    NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
    NEXT_PUBLIC_SUPABASE_ANON_KEY="your_supabase_anon_key"
    ```
