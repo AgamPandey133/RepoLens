@@ -1,4 +1,4 @@
-# 🧑‍💻 RepoLens – AI-Powered Developer Collaboration Platform
+# 🧑‍💻 RepoLens – The Agentic Workspace & Intelligence Hub for Engineering Teams
 
 **RepoLens** is an advanced AI-driven platform designed to simplify developer collaboration. It integrates cutting-edge tools for codebase understanding, agentic PR reviews, meeting intelligence, and robust AI observability. 
 
