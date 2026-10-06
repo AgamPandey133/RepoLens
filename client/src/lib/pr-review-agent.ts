@@ -124,7 +124,8 @@ async function retrieveContextForFiles(
 async function generateReview(
     files: PRFile[],
     contextMap: Map<string, CodeChunk[]>,
-    projectId: string
+    projectId: string,
+    systemPrompt?: string | null
 ): Promise<{ summary: string; sections: PRReviewSection[]; score: number }> {
     const start = Date.now();
 
@@ -143,7 +144,7 @@ async function generateReview(
         .join("\n\n");
 
     const prompt = `You are an expert senior software engineer performing an AI-powered code review.
-
+${systemPrompt ? `\n## Project Specific Guidelines (Follow STRICTLY):\n${systemPrompt}\n` : ""}
 ## Changed Files in this PR:
 ${diffSummary}
 
@@ -267,12 +268,20 @@ Return ONLY the JSON array.`;
  */
 export async function runPRReviewAgent(
     prUrl: string,
-    projectId: string
+    projectId: string,
+    postToGitHub: boolean = false
 ): Promise<PRReviewResult> {
     const totalStart = Date.now();
     const agentSteps: AgentStep[] = [];
+    
+    // Fetch project for system prompt
+    const project = await prisma.project.findUnique({
+        where: { id: projectId },
+        select: { systemPrompt: true, githubUrl: true }
+    });
 
     // ── Step 1: PLAN ────────────────────────────────────────────────────────
+
     agentSteps.push({ step: "Planning: Fetching PR files from GitHub", status: "running" });
     let files: PRFile[] = [];
     try {
@@ -301,7 +310,7 @@ export async function runPRReviewAgent(
 
     // ── Step 3: REVIEW ──────────────────────────────────────────────────────
     agentSteps.push({ step: "Reviewing: Generating structured code review with Gemini", status: "running" });
-    const rawReview = await generateReview(files, contextMap, projectId);
+    const rawReview = await generateReview(files, contextMap, projectId, project?.systemPrompt);
     agentSteps[2].status = "done";
     agentSteps[2].detail = `Generated ${rawReview.sections.length} review comments`;
 
@@ -312,7 +321,7 @@ export async function runPRReviewAgent(
     agentSteps[3].status = "done";
     agentSteps[3].detail = `Removed ${removedCount} hallucinated comment(s)`;
 
-    return {
+    const finalResult = {
         summary: rawReview.summary,
         sections: verifiedSections,
         overallScore: rawReview.score,
@@ -320,4 +329,64 @@ export async function runPRReviewAgent(
         retrievedFiles,
         latencyMs: Date.now() - totalStart,
     };
+    
+    if (postToGitHub) {
+        agentSteps.push({ step: "Posting: Adding review comments directly to GitHub PR", status: "running" });
+        try {
+            await postReviewToGitHub(prUrl, finalResult);
+            agentSteps[4].status = "done";
+        } catch (err) {
+            agentSteps[4].status = "skipped";
+            agentSteps[4].detail = `Failed to post to GitHub: ${err}`;
+        }
+    }
+
+    return finalResult;
+}
+
+// ─── Post Review to GitHub (Feature 1) ───────────────────────────────────────
+
+export async function postReviewToGitHub(prUrl: string, review: PRReviewResult) {
+    const match = prUrl.match(/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/);
+    if (!match) throw new Error("Invalid GitHub PR URL");
+
+    const [, owner, repo, pullNumber] = match;
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`;
+
+    let body = `### 🤖 RepoLens AI PR Review\n\n**Score:** ${review.overallScore}/100\n\n**Summary:**\n${review.summary}\n\n`;
+    body += `_Review was generated using Agentic RAG. Retrieved ${review.retrievedFiles.length} context files._\n\n`;
+    
+    const comments = review.sections.map(section => ({
+        path: section.file,
+        // Since we don't have the exact line number from the agent right now, 
+        // a full inline review requires line numbers. For a general review, 
+        // we can post it as a high-level review comment, or we can just append to the body.
+        // For simplicity in this scaffold, we append all sections to the main review body.
+    }));
+
+    for (const section of review.sections) {
+        body += `#### 📄 \`${section.file}\` (${section.category} - ${section.severity})\n`;
+        body += `${section.comment}\n`;
+        if (section.suggestion) {
+            body += `\n**Suggestion:**\n\`\`\`\n${section.suggestion}\n\`\`\`\n`;
+        }
+        body += `\n---\n`;
+    }
+
+    const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${process.env.GITHUB_ACCESS_TOKEN}`,
+            Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            body: body,
+            event: review.overallScore >= 70 ? "APPROVE" : "COMMENT"
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`GitHub API error: ${response.statusText}`);
+    }
 }

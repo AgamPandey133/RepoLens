@@ -46,9 +46,10 @@ model Project {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name      String
-  githubUrl String
-  deletedAt DateTime?
+  name         String
+  githubUrl    String
+  deletedAt    DateTime?
+  systemPrompt String?
 
   userToProjects UserToProject[]
 
