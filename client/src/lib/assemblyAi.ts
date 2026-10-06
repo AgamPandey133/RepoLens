@@ -23,6 +23,7 @@ export const processMeeting = async (meetingUrl: string) => {
     const transcript = await client.transcripts.transcribe({
         audio: meetingUrl,
         auto_chapters: true,
+        speaker_labels: true,
     })
 
     const summaries = transcript.chapters?.map(chapter => ({
@@ -32,12 +33,19 @@ export const processMeeting = async (meetingUrl: string) => {
         headline: chapter.headline,
         summary: chapter.summary
     })) || []
+    
+    const utterances = transcript.utterances?.map(utterance => ({
+        speaker: `Speaker ${utterance.speaker}`,
+        text: utterance.text,
+        start: msToTime(utterance.start),
+        end: msToTime(utterance.end)
+    })) || []
 
     if (!transcript.text) throw new Error('No transcript found')
 
-
     return {
-        summaries
-
+        summaries,
+        utterances,
+        transcriptUrl: transcript.id, // Can be useful for debugging
     }
 }

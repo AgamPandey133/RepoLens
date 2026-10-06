@@ -96,6 +96,9 @@ model Issue {
   gist      String
   headline  String
   summary   String
+  speaker   String?
+  solution  String?
+  status    String  @default("OPEN")
   meetingId String
   meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
 }
@@ -139,6 +142,7 @@ model Meeting {
   meetingUrl String
   name       String
   status     MeetingStatus @default(PROCESSING)
+  transcript Json?
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)

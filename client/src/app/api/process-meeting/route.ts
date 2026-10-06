@@ -1,9 +1,8 @@
-
 import { processMeeting } from "@/lib/assemblyAi";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
-
+import { extractMeetingIssues } from "@/lib/gemini";
 
 
 export async function POST(req: NextRequest) {
@@ -11,15 +10,36 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
 
         const { meetingUrl, projectId, meetingId } = body;
-        const { summaries } = await processMeeting(meetingUrl.url);
+        const { summaries, utterances, transcriptUrl } = await processMeeting(meetingUrl.url);
+        
+        let issues = summaries.map(summary => ({
+            start: summary.start,
+            end: summary.end,
+            gist: summary.gist,
+            headline: summary.headline,
+            summary: summary.summary,
+            speaker: "Unknown",
+            solution: "N/A"
+        }));
+
+        if (utterances && utterances.length > 0) {
+            const extractedIssues = await extractMeetingIssues(utterances);
+            if (extractedIssues && extractedIssues.length > 0) {
+                issues = extractedIssues.map((issue: any) => ({
+                    start: issue.start || "00:00",
+                    end: issue.end || "00:00",
+                    gist: issue.gist || "Topic",
+                    headline: issue.headline || "Issue",
+                    summary: issue.summary || "",
+                    speaker: issue.speaker || "Unknown",
+                    solution: issue.solution || "None"
+                }));
+            }
+        }
 
         await prisma.issue.createMany({
-            data: summaries.map(summary => ({
-                start: summary.start,
-                end: summary.end,
-                gist: summary.gist,
-                headline: summary.headline,
-                summary: summary.summary,
+            data: issues.map(issue => ({
+                ...issue,
                 meetingId,
             })),
         });
@@ -30,7 +50,8 @@ export async function POST(req: NextRequest) {
             },
             data: {
                 status: 'COMPLETED',
-                name: summaries[0] ? summaries[0].headline : 'Default',
+                name: issues[0] ? issues[0].headline : 'Default',
+                transcript: utterances as any,
             },
         });
 

@@ -88,6 +88,16 @@ function IssueCard({ issue }: { issue: NonNullable<RouterOutputs['project']['get
                             <p className='font-medium mt-2 text-gray-500'>
                                 {issue.summary}
                             </p>
+                            {issue.speaker && (
+                                <p className='mt-2 text-sm text-foreground/80 font-semibold'>
+                                    Raised by: {issue.speaker}
+                                </p>
+                            )}
+                            {issue.solution && (
+                                <p className='mt-1 text-sm text-foreground/80 font-semibold'>
+                                    Solution: {issue.solution}
+                                </p>
+                            )}
                         </blockquote>
                     </DialogHeader>
                 </DialogContent>

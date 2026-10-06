@@ -77,3 +77,48 @@ export async function generateEmbedding(summary: string) {
     const embedding = result.embedding;
     return embedding.values;
 }
+
+export async function extractMeetingIssues(utterances: { speaker: string, text: string }[]) {
+    const transcriptText = utterances.map(u => `${u.speaker}: ${u.text}`).join('\n');
+    const prompt = `You are an AI Meeting Assistant. Below is a transcript of a developer meeting. 
+Identify the main issues discussed. For each issue, identify the following:
+- start: The approximate start time (just use "00:00" for now, or infer if possible)
+- end: The approximate end time (just use "00:00" for now)
+- gist: The topic of the issue
+- headline: A short description of the issue
+- summary: A detailed summary of the issue and what was discussed
+- speaker: Who raised the issue (e.g. Speaker A)
+- solution: What was the proposed solution
+
+Return ONLY a valid JSON array of objects. Do not include markdown formatting like \`\`\`json.
+Example output:
+[
+  {
+    "start": "00:00",
+    "end": "00:00",
+    "gist": "Database Performance",
+    "headline": "Slow queries on the user table",
+    "summary": "Queries on the user table are taking too long due to missing indexes.",
+    "speaker": "Speaker A",
+    "solution": "Add an index on the email column."
+  }
+]
+
+Transcript:
+${transcriptText}`;
+
+    try {
+        const response = await model.generateContent(prompt);
+        let text = response.response.text().trim();
+        // Remove markdown formatting if the model still outputs it
+        if (text.startsWith('\`\`\`json')) {
+            text = text.replace(/^\`\`\`json\n/, '').replace(/\n\`\`\`$/, '');
+        } else if (text.startsWith('\`\`\`')) {
+            text = text.replace(/^\`\`\`\n/, '').replace(/\n\`\`\`$/, '');
+        }
+        return JSON.parse(text);
+    } catch (error) {
+        console.error("Error extracting meeting issues:", error);
+        return [];
+    }
+}
