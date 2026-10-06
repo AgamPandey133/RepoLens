@@ -40,6 +40,18 @@ Automatically generates embeddings and summaries for every file in your reposito
 ### 🎙️ Autonomous Meeting Bot & Intelligence
 Powered by **Recall.ai** and **AssemblyAI**, RepoLens can automatically join your team meetings (Google Meet, Zoom), record them, and perform **Speaker Diarization**. Gemini 2.0 then analyzes the transcript to extract key topics, who raised which issues, and proposed solutions.
 
+### 🤖 Automated PR Review Bot (Directly on GitHub)
+RepoLens acts as a GitHub App. When a PR is opened, it automatically runs an agentic review and posts inline comments directly on your GitHub PR timeline, acting like a true AI team member.
+
+### 🔄 Real-Time Codebase Sync
+Powered by GitHub Webhooks, RepoLens listens for push events and incrementally updates its vector database (pgvector). This guarantees the AI always has 100% up-to-date context of the repo.
+
+### 🏗️ AI Architect (Feature Implementation Plans)
+Don't just ask about existing code—ask how to build new features. The AI Architect retrieves relevant codebase context via Hybrid RAG and generates step-by-step implementation specs, complete with exactly which files to modify and the required code snippets.
+
+### 🎨 Project-Level Custom Personas & Rules
+Every team has different coding standards. Define custom system prompts per project (e.g., "Always use functional components and strict typing"). These rules are automatically injected into the Q&A bot, PR Reviewer, and AI Architect.
+
 ### 📝 Commit Message Summaries
 AI-powered commit summarization keeps you up to date with repository changes instantly.
 
