@@ -13,29 +13,33 @@ export async function POST(req: Request) {
             )
         }
 
-        const existing = await prisma.user.findUnique({ where: { email } })
+        const cleanEmail = email.trim().toLowerCase()
+        const cleanName = (name || '').trim() || cleanEmail.split('@')[0]
+
+        const existing = await prisma.user.findUnique({ where: { email: cleanEmail } })
         if (existing) {
-            return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+            return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 })
         }
 
         const hashed = await hashPassword(password)
         const user = await prisma.user.create({
             data: {
-                email,
+                email: cleanEmail,
                 password: hashed,
-                name,
-                imageUrl: imageUrl ?? null, // ✅ Save uploaded image or fallback null
+                name: cleanName,
+                imageUrl: imageUrl ?? null,
             },
         })
 
         const session = await createSessionForUser(user.id)
 
+        const isHttps = req.headers.get("x-forwarded-proto") === "https" || req.url.startsWith("https://");
         const cookieStore = await cookies()
         cookieStore.set({
             name: 'session',
             value: session.token,
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: process.env.NODE_ENV === 'production' && isHttps,
             sameSite: 'lax',
             path: '/',
             expires: session.expiresAt,
@@ -49,8 +53,14 @@ export async function POST(req: Request) {
                 imageUrl: user.imageUrl,
             },
         })
-    } catch (err) {
-        console.error(err)
-        return NextResponse.json({ error: 'Server error' }, { status: 500 })
+    } catch (err: any) {
+        console.error("Sign-up error:", err);
+        const errMsg = err?.message || "";
+        if (errMsg.includes("tenant") || errMsg.includes("ENOTFOUND") || errMsg.includes("Can't reach database") || err?.name === "PrismaClientInitializationError") {
+            return NextResponse.json({
+                error: "Database is unreachable or paused. Please restore/unpause your project in the Supabase dashboard."
+            }, { status: 503 });
+        }
+        return NextResponse.json({ error: err?.message || 'Server error' }, { status: 500 });
     }
 }

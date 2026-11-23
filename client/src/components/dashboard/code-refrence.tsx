@@ -18,9 +18,11 @@ const CodeRefrence = ({ filesRefrences }: Props) => {
     const [tab, setTab] = useState(filesRefrences[0]?.fileName);
     if (filesRefrences.length === 0) return null
 
+    const currentTab = filesRefrences.some(f => f.fileName === tab) ? tab : filesRefrences[0]?.fileName;
+
     return (
         <div className='max-w-[70vw]'>
-            <Tabs value={tab} onValueChange={setTab}>
+            <Tabs value={currentTab} onValueChange={setTab}>
                 <div className='overflow-scroll flex gap-1 bg-gray-200  p-1 rounded-md'>
                     {filesRefrences.map((file) => (
                         <Button variant={'outline'} onClick={() => setTab(file.fileName)} key={file.fileName} className={cn(

@@ -10,10 +10,12 @@ export async function POST(req: Request) {
         if (!projectId || !meetingUrl || !name) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
+
+        const url = typeof meetingUrl === "string" ? meetingUrl : (meetingUrl?.url ?? "");
         const meeting = await prisma.meeting.create({
             data: {
                 projectId,
-                meetingUrl: meetingUrl.url,
+                meetingUrl: url,
                 name,
                 status: "PROCESSING",
             },

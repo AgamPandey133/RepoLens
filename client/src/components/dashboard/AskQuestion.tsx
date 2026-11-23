@@ -121,6 +121,11 @@ const AskQuestionCard = () => {
                                         return
                                     }
 
+                                    if (!projectId) {
+                                        toast.error("Project ID missing")
+                                        return
+                                    }
+
                                     saveAnswer.mutate(
                                         {
                                             projectId,

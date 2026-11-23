@@ -13,7 +13,7 @@ export type Project = {
 
 type ProjectContextType = {
     projects?: Project[];
-    project?: Project;
+    project?: Project | null;
     projectId: string | null;
     setProjectId: (id: string) => void;
     isLoading: boolean;
@@ -22,9 +22,8 @@ type ProjectContextType = {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 async function fetchProjects(): Promise<Project[]> {
-
-    const res = await fetch(API_PATHS.GETPROJECTS);
-    if (!res.ok) throw new Error("Failed to fetch projects");
+    const res = await fetch(API_PATHS.GETPROJECTS, { credentials: "include" });
+    if (!res.ok) return [];
     return res.json();
 }
 

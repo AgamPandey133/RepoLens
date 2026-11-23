@@ -1,7 +1,8 @@
 import { API_PATHS } from "@/lib/paths"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export const useSignUp = () => {
+    const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (userData: { email: string; password: string; name:string; imageUrl?: string }) => {
             const res = await fetch(API_PATHS.SIGN_UP, {
@@ -9,6 +10,7 @@ export const useSignUp = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify(userData),
 
             });
@@ -18,6 +20,9 @@ export const useSignUp = () => {
             }
 
             return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["authUser"] })
         }
     })
 }

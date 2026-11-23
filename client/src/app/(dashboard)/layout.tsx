@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const { user, isLoading } = useAuth();
     const { projects, setProjectId, isLoading: isProjectLoader } = useProject();
 
-    if (isLoading || isProjectLoader) {
+    if (isLoading) {
         return <Spinner/>
     }
 
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     return (
         <div className="flex h-screen w-screen overflow-hidden bg-muted/40">
-            <SidebarComp projects={projects} isLoading={isLoading} setProjectId={setProjectId}/>
+            <SidebarComp projects={projects} isLoading={isProjectLoader} setProjectId={setProjectId}/>
 
             <div className="flex flex-1 flex-col">
                 <Navbar user={user} />

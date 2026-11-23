@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 import React, { useState } from 'react'
 import { Card } from '@/components/ui/card';
 import { useDropzone } from 'react-dropzone';
@@ -54,10 +54,23 @@ const MeetingCard = () => {
             }
 
             try {
-                const url = await uploadFile(file as File, setProgress) as string
+                if (!project.projectId) {
+                    toast.error("Please select a project first")
+                    setIsUploading(false)
+                    return
+                }
+
+                const uploadRes = await uploadFile(file as File, setProgress)
+                if (!uploadRes.success || !uploadRes.url) {
+                    toast.error("Upload failed")
+                    return
+                }
+
+                const url = uploadRes.url
+                const activeProjectId = project.projectId
 
                 uploadMeeting.mutate({
-                    projectId: project.projectId,
+                    projectId: activeProjectId,
                     meetingUrl: url,
                     name: file.name,
                 }, {
@@ -67,7 +80,7 @@ const MeetingCard = () => {
                         processMeeting.mutateAsync({
                             meetingUrl: url,
                             meetingId: meeting.id,
-                            projectId: project.projectId
+                            projectId: activeProjectId
                         })
                     },
                     onError: () => {

@@ -22,21 +22,21 @@ const QAPage = () => {
             <h1 className='text-xl font-semibold'>Saved Question</h1>
             <div className="h-2"></div>
             <div className="flex flex-col gap-2">
-                {questions?.map((question, index) => {
+                {questions?.map((question: any, index: number) => {
                     return <Fragment key={question.id}>
                         <SheetTrigger onClick={() => setQuestionIndex(index)}>
                             <div className='flex items-center gap-4  rounded-lg p-4 shadow border'>
-                                {question.user.imageUrl ? (
+                                {question.user?.imageUrl ? (
                                     <img
                                         className="rounded-full"
                                         height={30}
                                         width={30}
                                         src={question.user.imageUrl}
-                                        alt={question.user.name}
+                                        alt={question.user.name || "User"}
                                     />
                                 ) : (
                                     <div className="flex items-center justify-center rounded-full bg-gray-300 text-gray-700 font-semibold h-[30px] w-[30px]">
-                                        {question.user.name?.charAt(0).toUpperCase()}
+                                        {question.user?.name?.charAt(0).toUpperCase() || "U"}
                                     </div>
                                 )}
 

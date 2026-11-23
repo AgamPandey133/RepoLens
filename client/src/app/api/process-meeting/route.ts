@@ -10,7 +10,8 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
 
         const { meetingUrl, projectId, meetingId } = body;
-        const { summaries, utterances, transcriptUrl } = await processMeeting(meetingUrl.url);
+        const url = typeof meetingUrl === "string" ? meetingUrl : (meetingUrl?.url ?? "");
+        const { summaries, utterances, transcriptUrl } = await processMeeting(url);
         
         let issues = summaries.map(summary => ({
             start: summary.start,

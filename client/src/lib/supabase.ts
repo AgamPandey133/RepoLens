@@ -5,11 +5,15 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummyKey";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+export type UploadFileResult =
+    | { success: true; url: string; data: any }
+    | { success: false; error: any };
+
 export const uploadFile = async (
     file: File,
     onProgress?: (percent: number) => void,
     bucket: string = "audio-files"
-) => {
+): Promise<UploadFileResult> => {
     try {
         // Sanitize filename
         let safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -33,27 +37,25 @@ export const uploadFile = async (
             counter++;
         }
 
+        onProgress?.(25);
+
         // Use Supabase client upload
         const { data, error } = await supabase.storage
             .from(bucket)
             .upload(filePath, file, {
                 contentType: file.type,
                 upsert: false,
-                onUploadProgress: (progressEvent: ProgressEvent) => {
-                    if (onProgress && progressEvent.lengthComputable) {
-                        const percent = Math.round(
-                            (progressEvent.loaded / progressEvent.total) * 100
-                        );
-                        onProgress(percent);
-                    }
-                },
             });
 
         if (error) throw error;
 
+        onProgress?.(80);
+
         const { data: urlData } = supabase.storage
             .from(bucket)
             .getPublicUrl(filePath);
+
+        onProgress?.(100);
 
         return { success: true, url: urlData.publicUrl, data };
     } catch (err) {

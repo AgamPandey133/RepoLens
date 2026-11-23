@@ -24,7 +24,7 @@ import {
 
 // Helper for cleaner class names
 import { cn } from "@/lib/utils";
-import { Project } from "@prisma/client";
+import { Project } from "../ProjectProvider";
 
 // Data structure for main navigation links
 const mainNavLinks = [
@@ -34,7 +34,23 @@ const mainNavLinks = [
     { href: "/analytics", label: "AI Analytics", icon: BarChart2 },
 ];
 
-export const SidebarComp = ({projects,setProjectId,isLoading}) => {
+interface SidebarCompProps {
+    projects?: Project[];
+    setProjectId: (id: string) => void;
+    isLoading?: boolean;
+}
+
+interface SidebarLinkProps {
+    href: string;
+    label: string;
+    icon: React.ReactNode;
+    collapsed: boolean;
+    active?: boolean;
+    onClick?: () => void;
+    isButton?: boolean;
+}
+
+export const SidebarComp = ({ projects, setProjectId, isLoading }: SidebarCompProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const pathname = usePathname();
     
@@ -121,7 +137,7 @@ export const SidebarComp = ({projects,setProjectId,isLoading}) => {
 
 
 // A reusable Sidebar Link component for cleaner code
-const SidebarLink = ({ href, label, icon, collapsed, active, onClick, isButton = false }) => {
+const SidebarLink = ({ href, label, icon, collapsed, active = false, onClick, isButton = false }: SidebarLinkProps) => {
     const commonClasses = "flex items-center gap-4 rounded-lg px-3 py-2 text-sm font-medium transition-colors w-full";
     const activeClasses = "bg-primary/10 text-primary";
     const inactiveClasses = "text-foreground hover:bg-muted hover:text-foreground";

@@ -1,5 +1,5 @@
 import { API_PATHS } from "@/lib/paths"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 interface SignInData {
     email: string
@@ -7,6 +7,7 @@ interface SignInData {
 }
 
 export const useSignIn = () => {
+    const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (userData: SignInData) => {
             const res = await fetch(API_PATHS.LOGIN, {
@@ -14,6 +15,7 @@ export const useSignIn = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
                 body: JSON.stringify(userData),
             })
 
@@ -25,5 +27,8 @@ export const useSignIn = () => {
 
             return data 
         },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["authUser"] })
+        }
     })
 }

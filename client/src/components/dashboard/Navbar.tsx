@@ -18,10 +18,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "../AuthProvider";
+import { AuthUser } from "../AuthProvider";
 import { Spinner } from "../Spinner";
 import { useGlobalLoading } from "../LoaderProvider";
 import { useEffect } from "react";
-import { User } from "@/hooks/use-auth";
 
 // Helper for getting user initials
 const getInitials = (name: string) => {
@@ -32,7 +32,7 @@ const getInitials = (name: string) => {
         .join('');
 };
 
-export const Navbar = ({ user }: { user: User | null }) => {
+export const Navbar = ({ user }: { user: AuthUser | null }) => {
     
     
     return (
@@ -57,7 +57,7 @@ export const Navbar = ({ user }: { user: User | null }) => {
 
 
 
-const UserNav = ({ user }: { user: User | null }) => {
+const UserNav = ({ user }: { user: AuthUser | null }) => {
     const router = useRouter();
 
     if (!user) {
@@ -72,7 +72,7 @@ const UserNav = ({ user }: { user: User | null }) => {
             const res = await fetch("/api/auth/signout", { method: "POST" });
             if (res.ok) {
                 toast.success("Logged out successfully");
-                router.push("/login"); // redirect to login page
+                router.push("/sign-in"); // redirect to sign-in page
                 router.refresh(); // refresh state
             } else {
                 toast.error("Failed to log out");
@@ -88,18 +88,18 @@ const UserNav = ({ user }: { user: User | null }) => {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     {user.imageUrl ? (
-                                    <img
-                                        className="rounded-full"
-                                        height={30}
-                                        width={30}
-                                        src={user.imageUrl}
-                                        alt={user.name}
-                                    />
-                                ) :
-                    <Avatar className="h-9 w-9 border">
-                        <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-}
+                        <img
+                            className="rounded-full"
+                            height={30}
+                            width={30}
+                            src={user.imageUrl}
+                            alt={user.name ?? "User"}
+                        />
+                    ) : (
+                        <Avatar className="h-9 w-9 border">
+                            <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                    )}
                 </Button>
             </DropdownMenuTrigger>
 

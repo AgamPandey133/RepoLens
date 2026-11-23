@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 type Params = {
-    params: { projectId: string }
+    params: Promise<{ projectId: string }>
 }
 
 export async function GET(req: NextRequest, { params }: Params) {
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: Params) {
             orderBy: { createdAt: "desc" }, // latest first
             include: {
                 user: {
-                    select: { id: true, name: true, email: true }
+                    select: { id: true, name: true, email: true, imageUrl: true }
                 }
             }
         });

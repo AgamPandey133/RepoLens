@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useCreateForm } from "@/hooks/use-create-project"
 import { useForm } from "react-hook-form"
@@ -23,10 +23,14 @@ const CreateProject = () => {
             return;
         }
         
-        const res = mutate(data, {
-            onSuccess: () => {
+        mutate(data, {
+            onSuccess: (project: any) => {
                 toast.success("Project created successfully! Redirecting for analysis...");
-                // In a real app, you'd likely router.push('/project/' + newProjectId) here
+                if (project?.id) {
+                    router.push(`/project/${project.id}`);
+                } else {
+                    router.push('/');
+                }
             },
             onError: (error) => {
                 // Ensure error message is handled gracefully

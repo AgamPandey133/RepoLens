@@ -21,11 +21,11 @@ const TeamMembers = () => {
 
     return (
         <div className="flex items-center gap-2">
-            {members?.map((member) => (
+            {members?.map((member: any) => (
                 <img
                     key={member.id}
-                    src={member.user.imageUrl ?? ""}
-                    alt={member.user.firstName ?? ""}
+                    src={member.user?.imageUrl ?? ""}
+                    alt={member.user?.name ?? "Team Member"}
                     height={30}
                     width={30}
                     className="rounded-full"

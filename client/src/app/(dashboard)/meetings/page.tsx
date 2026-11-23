@@ -23,7 +23,7 @@ const MeetingPage = () => {
             {meetings && meetings.length === 0 && <div>No meetings found</div>}
             {isLoading && <div>Loading...</div>}
             <ul className='divide-y divide-gray-200'>
-                {meetings?.map(meeting => (
+                {meetings?.map((meeting: any) => (
                     <li key={meeting.id} className='flex items-center justify-between py-5 gap-x-6'>
                         <div>
                             <div className='min-w-0 '>
@@ -44,7 +44,7 @@ const MeetingPage = () => {
                                 </p>
 
                                 <p className='truncate'>
-                                    {meeting.issues.length} issues
+                                    {meeting.issues?.length || 0} issues
                                 </p>
                             </div>
                         </div>
@@ -55,7 +55,7 @@ const MeetingPage = () => {
                                 </Button>
                             </Link>
                             <Button size={'sm'} disabled={deleteMeeting.isPending} variant={'destructive'} onClick={() => {
-                                deleteMeeting.mutate({ meetingId: meeting.id }, {
+                                deleteMeeting.mutate({ meetingId: meeting.id, projectId: (projectId as string) || "" }, {
                                     onSuccess: () => {
                                         toast.success('Meeting deleted successfully')
                                         refetch()
